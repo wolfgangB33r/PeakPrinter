@@ -77,9 +77,9 @@ def normal_vector(triangle):
         return np.array([0.0, 0.0, 1.0], dtype=np.float32)
     return cp / mag
 
-def tif_to_stl(tif_path, stl_path, scale_z=1.0, sample_step=5, base_height=0.0, clip_min=None, clip_max=None):
+def tif_to_stl(tif_path, stl_path, scale_z=1.0, sample_step=15, base_height=0.0, clip_min=None, clip_max=None):
     """
-    Converts a GeoTIFF terrain file to a 3D STL mesh using improved normals and clipping.
+    Converts a GeoTIFF terrain file to a 3D STL mesh with a solid base from zero height.
     """
     with rasterio.open(tif_path) as src:
         elevation = src.read(1)[::sample_step, ::sample_step]
@@ -103,48 +103,136 @@ def tif_to_stl(tif_path, stl_path, scale_z=1.0, sample_step=5, base_height=0.0, 
             z = elevation[y, x] * scale_z + base_height
             vertices.append([x - x_offset, y_offset - y, z])
 
-    # STL binary writer
-    def write_stl(path, vertices, rows, cols):
+    # Add base vertices (same x/y, z=0)
+    base_vertices = []
+    for y in range(rows):
+        for x in range(cols):
+            base_vertices.append([x - x_offset, y_offset - y, 0.0])
+
+    def write_stl(path, vertices, base_vertices, rows, cols):
+        # Top surface facets
         facet_count = (rows - 1) * (cols - 1) * 2
+        # Add side and bottom facets
+        facet_count += (rows - 1) * 2 * 2  # left/right sides
+        facet_count += (cols - 1) * 2 * 2  # front/back sides
+        facet_count += (rows - 1) * (cols - 1) * 2  # bottom
+
         with open(path, 'wb') as f:
             f.write(b'\0' * 80)
             f.write(np.array([facet_count], dtype='<u4').tobytes())
+            # Top surface
             for y in range(rows - 1):
                 for x in range(cols - 1):
                     i = y * cols + x
-                    # Get indices for quad corners
                     a = i
                     b = i + cols
                     c = i + 1
                     d = b + 1
-                    # Get elevations for nodata skipping
                     av = elevation[y, x]
                     bv = elevation[y + 1, x]
                     cv = elevation[y, x + 1]
                     dv = elevation[y + 1, x + 1]
-                    # Skip triangles with nodata
                     if nodata is not None and (av == nodata or bv == nodata or cv == nodata or dv == nodata):
                         continue
-                    # First triangle (a, b, c)
                     tri1 = (vertices[a], vertices[b], vertices[c])
                     n1 = normal_vector(tri1)
                     f.write(np.array(n1, dtype='<f4').tobytes())
                     for v in tri1:
                         f.write(np.array(v, dtype='<f4').tobytes())
                     f.write(b'\0\0')
-                    # Second triangle (d, c, b)
                     tri2 = (vertices[d], vertices[c], vertices[b])
                     n2 = normal_vector(tri2)
                     f.write(np.array(n2, dtype='<f4').tobytes())
                     for v in tri2:
                         f.write(np.array(v, dtype='<f4').tobytes())
                     f.write(b'\0\0')
+            # Sides
+            # Left side (x=0)
+            for y in range(rows - 1):
+                top1 = y * cols
+                top2 = (y + 1) * cols
+                base1 = y * cols
+                base2 = (y + 1) * cols
+                tri1 = (vertices[top1], base_vertices[base2], base_vertices[base1])
+                tri2 = (vertices[top1], vertices[top2], base_vertices[base2])
+                for tri in [tri1, tri2]:
+                    n = normal_vector(tri)
+                    f.write(np.array(n, dtype='<f4').tobytes())
+                    for v in tri:
+                        f.write(np.array(v, dtype='<f4').tobytes())
+                    f.write(b'\0\0')
+            # Right side (x=cols-1)
+            for y in range(rows - 1):
+                top1 = y * cols + (cols - 1)
+                top2 = (y + 1) * cols + (cols - 1)
+                base1 = y * cols + (cols - 1)
+                base2 = (y + 1) * cols + (cols - 1)
+                tri1 = (vertices[top1], base_vertices[base1], base_vertices[base2])
+                tri2 = (vertices[top1], base_vertices[base2], vertices[top2])
+                for tri in [tri1, tri2]:
+                    n = normal_vector(tri)
+                    f.write(np.array(n, dtype='<f4').tobytes())
+                    for v in tri:
+                        f.write(np.array(v, dtype='<f4').tobytes())
+                    f.write(b'\0\0')
+            # Front side (y=0)
+            for x in range(cols - 1):
+                top1 = x
+                top2 = x + 1
+                base1 = x
+                base2 = x + 1
+                tri1 = (vertices[top1], base_vertices[base1], base_vertices[base2])
+                tri2 = (vertices[top1], base_vertices[base2], vertices[top2])
+                for tri in [tri1, tri2]:
+                    n = normal_vector(tri)
+                    f.write(np.array(n, dtype='<f4').tobytes())
+                    for v in tri:
+                        f.write(np.array(v, dtype='<f4').tobytes())
+                    f.write(b'\0\0')
+            # Back side (y=rows-1)
+            for x in range(cols - 1):
+                top1 = (rows - 1) * cols + x
+                top2 = (rows - 1) * cols + x + 1
+                base1 = (rows - 1) * cols + x
+                base2 = (rows - 1) * cols + x + 1
+                tri1 = (vertices[top1], base_vertices[base2], base_vertices[base1])
+                tri2 = (vertices[top1], vertices[top2], base_vertices[base2])
+                for tri in [tri1, tri2]:
+                    n = normal_vector(tri)
+                    f.write(np.array(n, dtype='<f4').tobytes())
+                    for v in tri:
+                        f.write(np.array(v, dtype='<f4').tobytes())
+                    f.write(b'\0\0')
+            # Bottom face
+            for y in range(rows - 1):
+                for x in range(cols - 1):
+                    i = y * cols + x
+                    a = i
+                    b = i + cols
+                    c = i + 1
+                    d = b + 1
+                    tri1 = (base_vertices[a], base_vertices[b], base_vertices[c])
+                    tri2 = (base_vertices[d], base_vertices[c], base_vertices[b])
+                    for tri in [tri1, tri2]:
+                        n = normal_vector(tri)
+                        f.write(np.array(n, dtype='<f4').tobytes())
+                        for v in tri:
+                            f.write(np.array(v, dtype='<f4').tobytes())
+                        f.write(b'\0\0')
 
-    write_stl(stl_path, vertices, rows, cols)
-    print(f"✅ STL file saved: {stl_path}")
+    write_stl(stl_path, vertices, base_vertices, rows, cols)
+    print(f"✅ Solid STL file saved: {stl_path}")
 
 if __name__ == "__main__":
-    # Example usage: download all files for latitude -90, longitude -156, resolution 10m
-    latitude = 47
-    longitude = 13
-    download_tile_files(latitude, longitude, resolution=30, download_path='./tiles')
+    # Ask user for latitude and longitude (float or int)
+    try:
+        latitude = float(input("Enter latitude: "))
+        longitude = float(input("Enter longitude: "))
+        latitude = int(latitude)
+        longitude = int(longitude)
+    except ValueError:
+        print("Invalid input. Please enter numeric values for latitude and longitude.")
+        exit(1)
+    # You can also ask for resolution if needed
+    resolution = 30  # or prompt for this as well
+    download_tile_files(latitude, longitude, resolution=resolution, download_path='./tiles')

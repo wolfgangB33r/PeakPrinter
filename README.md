@@ -1,6 +1,6 @@
-# PeakPrinter
+# Peak Printer
 
-PeakPrinter is a Python project for downloading, processing, and converting Copernicus DEM (Digital Elevation Model) data into 3D printable STL files. The project enables users to select a geographic region, retrieve the corresponding elevation data from the Copernicus DEM S3 bucket, and generate a 3D terrain model suitable for visualization or 3D printing.
+Peak Printer is a Python project for downloading, processing, and converting Copernicus DEM (Digital Elevation Model) data into 3D printable STL files. The project enables users to select a geographic region, retrieve the corresponding elevation data from the Copernicus DEM S3 bucket, and generate a 3D terrain model suitable for visualization or 3D printing.
 
 ## Purpose
 
@@ -26,6 +26,20 @@ The Copernicus DEM files are hosted on AWS S3. You can find a list of the availa
 
 [AWS Open Data Registry: Copernicus DEM](https://registry.opendata.aws/copernicus-dem/)
 
+## Example: Austria (Gmunden Region, Lat: 47 Lon: 13)
+
+Below is a screenshot of a 3D terrain model generated for an area in Austria around Gmunden using PeakPrinter and Copernicus DEM data:
+
+![Austria Gmunden Terrain Model](./screenshots/austria_gmunden_example.png)
+
+## Example: Austria (Hallstadt Region, Lat: 47 Lon: 13)
+
+Below is a screenshot of a 3D terrain model generated for an area in Austria around Gmunden using PeakPrinter and Copernicus DEM data:
+
+![Austria Gmunden Terrain Model](./screenshots/austria_gmunden_example.png)
+
+*This example demonstrates how you can use PeakPrinter to visualize and 3D print real-world terrain data for any region.*
+
 ## Features
 
 - Download Copernicus DEM tiles for a given latitude and longitude
@@ -49,4 +63,14 @@ The Copernicus DEM files are hosted on AWS S3. You can find a list of the availa
 
 ## License
 
-This project is provided for educational and research purposes. Please check the Copernicus DEM data license before using the data for commercial
+This project is provided for educational and research purposes. Please check the Copernicus DEM data license before using the data for commercial applications.
+
+---
+
+## Kudos to ESA Copernicus and Open Data!
+
+**A huge thank you and endless kudos to the European Space Agency (ESA) and the Copernicus mission for their visionary commitment to open data!**  
+The Copernicus Programme's open data policy empowers researchers, educators, makers, and innovators around the world to access high-quality earth observation data for free. This openness fuels countless scientific discoveries, educational initiatives, and creative projects—like PeakPrinter—that would not be possible without such generous access.
+
+Copernicus stands as a shining example of how open data can drive progress, collaboration, and inspiration across borders and disciplines.  
+**Thank you, ESA Copernicus, for making the world a better, smarter, and more connected place through your dedication to open data!**
