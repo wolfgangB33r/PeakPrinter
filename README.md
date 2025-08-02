@@ -36,7 +36,7 @@ Below is a screenshot of a 3D terrain model generated for an area in Austria aro
 
 Below is a screenshot of a 3D terrain model generated for an area in Austria around Gmunden using PeakPrinter and Copernicus DEM data:
 
-![Austria Gmunden Terrain Model](./screenshots/austria_gmunden_example.png)
+![Austria Gmunden Terrain Model](./screenshots/austria_traunstein_gmunden.png)
 
 *This example demonstrates how you can use PeakPrinter to visualize and 3D print real-world terrain data for any region.*
 
