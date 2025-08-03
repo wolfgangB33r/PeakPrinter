@@ -82,6 +82,9 @@ You can run PeakPrinter directly in a GitHub Codespace:
    ```
    Follow the prompts for latitude, longitude, and area size.
 
+4. **Download the result STL file**  
+   Locate the resulting STL file in the Codespaces file explorer on the right side, right click on download to receive the file.
+
 **Tip:**  
 You can also use VS Code's integrated terminal and editor features in Codespaces for development and debugging.
 
