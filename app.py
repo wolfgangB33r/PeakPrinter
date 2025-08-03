@@ -19,6 +19,10 @@ def latlon_to_tile(lat, lon, resolution=90):
     return f"Copernicus_DSM_COG_{resolution}_{lat_prefix}{lat_deg:02d}_00_{lon_prefix}{lon_deg:03d}_00_DEM"
 
 def download_tile_files(lat, lon, resolution=90, download_path='.', area_km=10):
+    # Create the download_path folder if it does not exist
+    if not os.path.exists(download_path):
+        os.makedirs(download_path)
+
     s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED), region_name='eu-central-1')
     bucket_name = 'copernicus-dem-90m'
     tile_base = latlon_to_tile(lat, lon, resolution)
