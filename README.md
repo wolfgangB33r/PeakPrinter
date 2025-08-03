@@ -26,17 +26,13 @@ The Copernicus DEM files are hosted on AWS S3. You can find a list of the availa
 
 [AWS Open Data Registry: Copernicus DEM](https://registry.opendata.aws/copernicus-dem/)
 
-## Example: Austria (Gmunden Region, Lat: 47 Lon: 13)
+## Example: Austria (Hallstadt, Lat: 47 Lon: 13)
 
-Below is a screenshot of a 3D terrain model generated for an area in Austria around Gmunden using PeakPrinter and Copernicus DEM data:
+Below is a screenshot of a 3D terrain model generated for the famous village of Hallstadt in the Austrian alps using PeakPrinter and Copernicus DEM data:
 
-![Austria Gmunden Terrain Model](./screenshots/austria_gmunden_example.png)
+![Hallstadt, Austria Alps 3D printable terrain model](./examples/austria_traunstein_gmunden.png)
 
-## Example: Austria (Hallstadt Region, Lat: 47 Lon: 13)
-
-Below is a screenshot of a 3D terrain model generated for an area in Austria around Gmunden using PeakPrinter and Copernicus DEM data:
-
-![Austria Gmunden Terrain Model](./screenshots/austria_traunstein_gmunden.png)
+![Hallstadt, Austria Alps 3D printable terrain model sliced file](./examples/Hallstadt_Autria_Copernicus_DSM_COG_30_N47_00_E013_00_DEM_Copernicus_DSM_COG_30_N47_00_E013_00_DEM_0.4n_0.2mm_PLA_MINIIS_2h15m.bgcode)
 
 *This example demonstrates how you can use PeakPrinter to visualize and 3D print real-world terrain data for any region.*
 

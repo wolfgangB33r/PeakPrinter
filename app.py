@@ -18,7 +18,7 @@ def latlon_to_tile(lat, lon, resolution=90):
     lon_deg = abs(int(lon))
     return f"Copernicus_DSM_COG_{resolution}_{lat_prefix}{lat_deg:02d}_00_{lon_prefix}{lon_deg:03d}_00_DEM"
 
-def download_tile_files(lat, lon, resolution=90, download_path='.'):
+def download_tile_files(lat, lon, resolution=90, download_path='.', area_km=10):
     s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED), region_name='eu-central-1')
     bucket_name = 'copernicus-dem-90m'
     tile_base = latlon_to_tile(lat, lon, resolution)
@@ -54,13 +54,8 @@ def download_tile_files(lat, lon, resolution=90, download_path='.'):
     for tif_file in tif_files:
         local_tif_path = f"{download_path}/{tif_file.replace('/', '_')}"
         stl_file = local_tif_path.replace('.tif', '.stl')
-        '''
-        if os.path.exists(stl_file):
-            print(f"STL file already exists, skipping: {stl_file}")
-            continue
-        '''
         print(f"Converting {local_tif_path} to {stl_file}")
-        tif_to_stl(local_tif_path, stl_file, scale_z=1.0, sample_step=1, base_height=0.0, clip_min=None, clip_max=None)
+        tif_to_stl(local_tif_path, stl_file, center_lat=lat, center_lon=lon, area_km=area_km, scale_z=1.0, sample_step=1, base_height=0.0, clip_min=None, clip_max=None)
 
 
 def normal_vector(triangle):
@@ -77,12 +72,36 @@ def normal_vector(triangle):
         return np.array([0.0, 0.0, 1.0], dtype=np.float32)
     return cp / mag
 
-def tif_to_stl(tif_path, stl_path, scale_z=1.0, sample_step=15, base_height=0.0, clip_min=None, clip_max=None):
+def tif_to_stl(tif_path, stl_path, center_lat, center_lon, area_km=10, scale_z=1.0, sample_step=1, base_height=0.0, clip_min=None, clip_max=None):
     """
     Converts a GeoTIFF terrain file to a 3D STL mesh with a solid base from zero height.
+    Crops a square area of area_km x area_km around center_lat, center_lon.
     """
     with rasterio.open(tif_path) as src:
-        elevation = src.read(1)[::sample_step, ::sample_step]
+        transform = src.transform
+
+        # Convert area_km to degrees (approximate, works well for small areas)
+        km_per_degree = 111.0
+        area_deg = area_km / km_per_degree
+
+        # Get pixel coordinates for center point
+        center_px, center_py = ~transform * (center_lon, center_lat)
+        center_px = int(center_px)
+        center_py = int(center_py)
+
+        # Calculate number of pixels for area_deg
+        pixel_size_x = abs(transform.a)
+        pixel_size_y = abs(transform.e)
+        pixels_x = int(area_deg / pixel_size_x)
+        pixels_y = int(area_deg / pixel_size_y)
+
+        half_x = pixels_x // 2
+        half_y = pixels_y // 2
+        window = rasterio.windows.Window(
+            center_px - half_x, center_py - half_y, pixels_x, pixels_y
+        )
+
+        elevation = src.read(1, window=window)[::sample_step, ::sample_step]
         nodata = src.nodata
         elevation = np.nan_to_num(elevation)
         rows, cols = elevation.shape
@@ -224,15 +243,14 @@ def tif_to_stl(tif_path, stl_path, scale_z=1.0, sample_step=15, base_height=0.0,
     print(f"✅ Solid STL file saved: {stl_path}")
 
 if __name__ == "__main__":
-    # Ask user for latitude and longitude (float or int)
+    # Ask user for latitude and longitude (float with decimals)
     try:
-        latitude = float(input("Enter latitude: "))
-        longitude = float(input("Enter longitude: "))
-        latitude = int(latitude)
-        longitude = int(longitude)
+        latitude = float(input("Enter latitude (e.g. 47.1234): "))
+        longitude = float(input("Enter longitude (e.g. 11.5678): "))
+        area_km = int(input("Enter area size in km (e.g. 10): "))
     except ValueError:
-        print("Invalid input. Please enter numeric values for latitude and longitude.")
+        print("Invalid input. Please enter numeric values for latitude, longitude, and area size.")
         exit(1)
     # You can also ask for resolution if needed
     resolution = 30  # or prompt for this as well
-    download_tile_files(latitude, longitude, resolution=resolution, download_path='./tiles')
+    download_tile_files(latitude, longitude, resolution=resolution, download_path='./tiles', area_km=area_km)
