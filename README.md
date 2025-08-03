@@ -62,6 +62,29 @@ Below is a screenshot of a 3D terrain model generated for the famous village of 
 2. Install the required Python packages.
 3. Run the provided scripts to list, download, and convert DEM data.
 
+## Running in GitHub Codespaces
+
+You can run PeakPrinter directly in a GitHub Codespace:
+
+1. **Open a Codespace**  
+   - On GitHub, click the green "Code" button and select "Open with Codespaces" (or create a new Codespace).
+
+2. **Install dependencies**  
+   In the Codespace terminal, run:
+   ```
+   pip install boto3 rasterio numpy numpy-stl
+   ```
+
+3. **Run the app**  
+   In the terminal, execute:
+   ```
+   python app.py
+   ```
+   Follow the prompts for latitude, longitude, and area size.
+
+**Tip:**  
+You can also use VS Code's integrated terminal and editor features in Codespaces for development and debugging.
+
 ## License
 
 This project is provided for educational and research purposes. Please check the Copernicus DEM data license before using the data for commercial applications.
