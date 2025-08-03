@@ -1,6 +1,7 @@
 # Peak Printer
 
 Peak Printer is a Python project for downloading, processing, and converting Copernicus DEM (Digital Elevation Model) data into 3D printable STL files. The project enables users to select a geographic region, retrieve the corresponding elevation data from the Copernicus DEM S3 bucket, and generate a 3D terrain model suitable for visualization or 3D printing.
+See my [Blog post](https://www.smartlab.at/peak-printer-3d-print-our-favourite-landscape/).
 
 ## Purpose
 
