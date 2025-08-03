@@ -94,6 +94,9 @@ def tif_to_stl(tif_path, stl_path, center_lat, center_lon, area_km=10, scale_z=1
         pixel_size_y = abs(transform.e)
         pixels_x = int(area_deg / pixel_size_x)
         pixels_y = int(area_deg / pixel_size_y)
+        # calculate the pixel size in km
+        pixel_size_km_x = pixel_size_x * km_per_degree
+        pixel_size_km_y = pixel_size_y * km_per_degree
 
         half_x = pixels_x // 2
         half_y = pixels_y // 2
@@ -115,6 +118,21 @@ def tif_to_stl(tif_path, stl_path, center_lat, center_lon, area_km=10, scale_z=1
     # Centering the grid
     x_offset = cols / 2
     y_offset = rows / 2
+
+    # Set scale_z to match horizontal scale (or less for less exaggeration)
+    # Default: vertical exaggeration is 1/20th of horizontal scale
+    
+    scale_z = pixel_size_km_x 
+
+    print("Pixel size X in degree:", pixel_size_x)
+    print("Pixel size Y in degree:", pixel_size_y)
+    print("Pixel size in km X:", pixel_size_km_x)
+    print("Pixel size in km Y:", pixel_size_km_y)   
+    print("Scale Z:", scale_z)
+    print("Rows:", rows, "Cols:", cols)
+    print("Area (km):", area_km, "Approx. Area (degrees):", area_deg)
+    print("Center Latitude:", center_lat, "Center Longitude:", center_lon)
+    print("Base Height:", base_height)
 
     vertices = []
     for y in range(rows):
@@ -245,9 +263,9 @@ def tif_to_stl(tif_path, stl_path, center_lat, center_lon, area_km=10, scale_z=1
 if __name__ == "__main__":
     # Ask user for latitude and longitude (float with decimals)
     try:
-        latitude = float(input("Enter latitude (e.g. 47.1234): "))
-        longitude = float(input("Enter longitude (e.g. 11.5678): "))
-        area_km = int(input("Enter area size in km (e.g. 10): "))
+        latitude = float(input("Enter latitude (e.g. 47.56): "))
+        longitude = float(input("Enter longitude (e.g. 13.64): "))
+        area_km = int(input("Enter area size in km (e.g. 30): "))
     except ValueError:
         print("Invalid input. Please enter numeric values for latitude, longitude, and area size.")
         exit(1)

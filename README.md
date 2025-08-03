@@ -32,7 +32,11 @@ Below is a screenshot of a 3D terrain model generated for the famous village of 
 
 ![Hallstadt, Austria Alps 3D printable terrain model](./examples/austria_traunstein_gmunden.png)
 
-![Hallstadt, Austria Alps 3D printable terrain model sliced file](./examples/Hallstadt_Autria_Copernicus_DSM_COG_30_N47_00_E013_00_DEM_Copernicus_DSM_COG_30_N47_00_E013_00_DEM_0.4n_0.2mm_PLA_MINIIS_2h15m.bgcode)
+![Hallstadt, Austria Alps focused 30km](./examples/austria_hallstadt_centered.png)
+
+[Hallstadt, Austria Alps 3D STL model](./examples/Hallstadt_Austria_Copernicus_DSM_COG_30_N47_00_E013_00_DEM_Copernicus_DSM_COG_30_N47_00_E013_00_DEM.stl)
+
+[Hallstadt, Austria Alps 3D printable terrain model sliced file](./examples/Hallstadt_Autria_Copernicus_DSM_COG_30_N47_00_E013_00_DEM_Copernicus_DSM_COG_30_N47_00_E013_00_DEM_0.4n_0.2mm_PLA_MINIIS_2h15m.bgcode)
 
 *This example demonstrates how you can use PeakPrinter to visualize and 3D print real-world terrain data for any region.*
 
