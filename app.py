@@ -269,7 +269,10 @@ if __name__ == "__main__":
     try:
         latitude = float(input("Enter latitude (e.g. 47.56): "))
         longitude = float(input("Enter longitude (e.g. 13.64): "))
-        area_km = int(input("Enter area size in km (e.g. 30): "))
+        area_km = int(input("Enter area size in km (e.g. 30, max 100): "))
+        if area_km > 100:
+            print("Area size too large. Please enter a value of 100 km or less.")
+            exit(1)
     except ValueError:
         print("Invalid input. Please enter numeric values for latitude, longitude, and area size.")
         exit(1)
