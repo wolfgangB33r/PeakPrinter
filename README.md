@@ -26,7 +26,7 @@ The Copernicus DEM files are hosted on AWS S3. You can find a list of the availa
 
 [AWS Open Data Registry: Copernicus DEM](https://registry.opendata.aws/copernicus-dem/)
 
-## Example: Austria (Hallstadt, Lat: 47 Lon: 13)
+## Example: Austria (Hallstadt, Lat: 47.56 Lon: 13.64)
 
 Below is a screenshot of a 3D terrain model generated for the famous village of Hallstadt in the Austrian alps using PeakPrinter and Copernicus DEM data:
 
